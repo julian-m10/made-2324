@@ -42,7 +42,7 @@ def alter_csv_data(untidy_df):
 
 def create_sqlite_db(sql_data, db_name, table_name):
     try:
-        engine = sql.create_engine(f'sqlite:///../data/{db_name}')
+        engine = sql.create_engine(f'sqlite:///../{db_name}')
         data_types = {
             'Laenge': sql.Float,
             'Breite': sql.Float,
