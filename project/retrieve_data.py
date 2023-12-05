@@ -61,7 +61,7 @@ def process_existing_file(existing_file, engine, file_info):
     :param engine: SQLite database engine.
     :param file_info: Information about the file which is to be processed. Retrievable from the csv_files_info.json.
     """
-    file_path = existing_file[0]
+    file_path = [file for file in existing_file if file.lower().endswith('.csv')][0]
     print(f"Importing {file_info['file_name']} from file system")
     try:
         with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
