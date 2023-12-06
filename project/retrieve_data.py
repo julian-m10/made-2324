@@ -1,66 +1,122 @@
-import os.path
+import json
+import os
+import numpy as np
 import pandas as pd
-import sqlalchemy as db
+import sqlalchemy as sql
+import zipfile
+
 from kaggle.api.kaggle_api_extended import KaggleApi
-from sqlalchemy_utils import database_exists, create_database
+
+
+def check_file_exists(directory, file_substring):
+    """
+    :param directory: The directory in which the search is executed.
+    :param file_substring: The file to check on. Can be a substring.
+    :return: The file path if a file with the substring was found.
+    """
+    file_list_exists = [
+        os.path.join(root, file)
+        for root, _, files in os.walk(directory)
+        for file in files
+        if file_substring in file
+    ]
+    return file_list_exists
+
+
+def download_files_from_kaggle(kaggle_api, dataset_name, author, file_name, directory):
+    """
+    :param kaggle_api: Kaggle API object.
+    :param dataset_name: The dataset from which data shall be downloaded.
+    :param author: The author of the searched dataset.
+    :param file_name: The file which should be downloaded.
+    :param directory: The target directory in which the downloaded data will be saved.
+    """
+    kaggle_api.dataset_download_file(dataset=f"{author}/{dataset_name}", file_name=file_name, path=directory)
+
+
+def process_non_existing_file(kaggle_api, engine, data_directory, file_info):
+    """
+    :param kaggle_api: Kaggle API object.
+    :param engine: SQLite database engine.
+    :param data_directory: Directory in which data file should be located.
+    :param file_info: Information about the file which is to be processed. Retrievable from the csv_files_info.json.
+    """
+    print(f"{file_info['file_name']} not found. Downloading from Kaggle...")
+    download_files_from_kaggle(
+        kaggle_api, file_info['dataset_name'], file_info['author'], file_info['file_name'],
+        data_directory + '/' + file_info['dataset_name']
+    )
+    file_path = check_file_exists(data_directory, file_info['file_name']).pop()
+    if zipfile.is_zipfile(file_path):
+        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+            zip_ref.extractall(data_directory + '/' + file_info['dataset_name'])
+    existing_file = check_file_exists(data_directory, file_info['file_name'])
+    process_existing_file(existing_file, engine, file_info)
+
+
+def process_existing_file(existing_file, engine, file_info):
+    """
+    All files will at any point be treated in this function.
+    :param existing_file: The path specifying where the file is located.
+    :param engine: SQLite database engine.
+    :param file_info: Information about the file which is to be processed. Retrievable from the csv_files_info.json.
+    """
+    file_path = [file for file in existing_file if file.lower().endswith('.csv')][0]
+    print(f"Importing {file_info['file_name']} from file system")
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
+            df = pd.read_csv(file)
+            print(f"Clean the {file_info['file_name']} dataset...")
+            tidy_df = clean_dataset(df, file_info)
+            print(f"Creating table for {file_info['file_name']} in SQLite database...")
+            create_sqlite_table(tidy_df, file_info['file_name'].replace('.csv', ''), engine)
+    except UnicodeDecodeError as e:
+        print(f"Error reading file: {e}")
+
+
+def clean_dataset(df, file_info):
+    """
+    :param df: The dataframe which is to be cleaned.
+    :param file_info: Information about the file which is to be processed. Retrievable from the csv_files_info.json.
+    :return: The cleaned dataframe containing only the wanted data.
+    """
+    important_cols = file_info['important_columns']
+    # Filter after year (specifically needed for london-crime dataset)
+    if 'year' in df:
+        df = df[df['year'] > 2012]
+    df.replace('', np.nan)
+    cleaned_df = df[important_cols].dropna()
+    return cleaned_df
+
+
+def create_sqlite_table(df, table_name, engine):
+    """
+    :param df: The dataframe for which a table will be created in the SQLite database. Existing ones will be updated.
+    :param table_name: Specifies the table_name in the SQLite database.
+    :param engine: SQLite database engine.
+    :return:
+    """
+    df.to_sql(name=table_name, con=engine, index=False, if_exists='append')
 
 
 def main():
-    api = KaggleApi()
-    api.authenticate()
-    download_datasets(api)
-    alter_datasets()
+    kaggle_api = KaggleApi()
+    kaggle_api.authenticate()
+    data_directory = '../data'
+    engine = sql.create_engine('sqlite:///../data/data.sqlite')
 
+    # Import the info about the csv-files that are needed from a json-file.
+    with open('csv_files_info.json', 'r', encoding='utf-8', errors='replace') as file:
+        csv_files_info = json.load(file)
 
-def download_datasets(k_api):
-    """
-    Checks file system if data is already existent to avoid unnecessary download traffic.
-    If not, the specified files will be downloaded using the Kaggle API object.
-    """
-    # files_to_download = ['smart_meters/acorn_details.csv', 'smart_meters/informations_households.csv',
-    #                      'crime/london_crime_by_lsoa.csv', 'housing/housing_in_london_yearly_variables.csv',
-    #                      'borough_demo/london-borough-profiles-2016 Data set.csv']
-    if not os.path.isfile('../data/smart_meters/acorn_details.csv'):
-        k_api.dataset_download_file(dataset='jeanmidev/smart-meters-in-london', file_name='acorn_details.csv',
-                                    path='../data/smart_meters')
-    if not os.path.isfile('../data/smart_meters/informations_households.csv'):
-        k_api.dataset_download_file(dataset='jeanmidev/smart-meters-in-london', file_name='informations_households.csv',
-                                    path='../data/smart_meters')
-    if not os.path.isfile('../data/crime/london_crime_by_lsoa.csv.zip'):
-        k_api.dataset_download_file(dataset='jboysen/london-crime', file_name='london_crime_by_lsoa.csv',
-                                    path='../data/crime')  # Huge file (approx. 1GB) --> can take a while
-    if not os.path.isfile('../data/housing/housing_in_london_yearly_variables.csv'):
-        k_api.dataset_download_file(dataset='justinas/housing-in-london',
-                                    file_name='housing_in_london_yearly_variables.csv',
-                                    path='../data/housing')
-    if not os.path.isfile('../data/borough_demo/london-borough-profiles-2016 Data set.csv'):
-        k_api.dataset_download_file(dataset='marshald/london-boroughs',
-                                    file_name='london-borough-profiles-2016 Data set.csv',
-                                    path='../data/borough_demo')
-
-
-def alter_datasets():
-    borough_demo = pd.read_csv('../data/borough_demo/london-borough-profiles-2016%20Data%20set.csv')
-    crime = pd.read_csv('../data/crime/london_crime_by_lsoa.csv.zip')
-    housing = pd.read_csv('../data/housing/housing_in_london_yearly_variables.csv')
-    smart_meters_acorn = pd.read_csv('../data/smart_meters/acorn_details.csv')
-    smart_meters_households = pd.read_csv('../data/smart_meters/informations_households.csv')
-
-    save_to_database(borough_demo=borough_demo)
-
-
-def save_to_database(**dfs):
-    # There is unfortunately still an error with the connection of SQLALchemy to the local sqlite database
-    pass
-    # engine = db.create_engine('sqlite:///data/database.sqlite', echo=True)
-    # if not database_exists(engine.url):
-    #     create_database(engine.url)
-    # con = engine.connect()
-    #
-    # for df in dfs:
-    #     metadata = db.MetaData()
-    #     table = db.Table('test', metadata, db.Column('test', db.String, primary_key=True))
-    #     metadata.create_all(engine)
+    for file_info in csv_files_info:
+        # Process every file specified in the csv_files_info.json.
+        # If the data does not exist locally, it is downloaded from Kaggle first.
+        existing_file = check_file_exists(data_directory, file_info['file_name'])
+        if not existing_file:
+            process_non_existing_file(kaggle_api, engine, data_directory, file_info)
+        if existing_file:
+            process_existing_file(existing_file, engine, file_info)
 
 
 if __name__ == "__main__":
