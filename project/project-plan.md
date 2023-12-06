@@ -60,11 +60,12 @@ This data contains information about the housing market of London from the years
 
 <!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
 
-1. Retrieve data sets and set up data pipeline [#6][i6]
-2. Find suitable demographic classifiers [#1][i1]
-3. Define parameters to measure quality of life [#2][i2]
-4. Map demographic classifiers towards the quality of life parameters [#3][i3]
-5. Analyze the mappings [#4][i4]
+1. Retrieve data sets and set up data pipeline including system tests [#6][i6] -- **Completed**
+2. Setup CI for project [#7][i7]
+3. Find suitable demographic classifiers [#1][i1]
+4. Define parameters to measure quality of life [#2][i2]
+5. Map demographic classifiers towards the quality of life parameters [#3][i3]
+6. Analyze the mappings [#4][i4]
  
 
 [i1]: https://github.com/julian-m10/made-2324/issues/1
@@ -72,3 +73,4 @@ This data contains information about the housing market of London from the years
 [i3]: https://github.com/julian-m10/made-2324/issues/3
 [i4]: https://github.com/julian-m10/made-2324/issues/4
 [i6]: https://github.com/julian-m10/made-2324/issues/6
+[i7]: https://github.com/julian-m10/made-2324/issues/8
