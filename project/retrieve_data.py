@@ -5,6 +5,7 @@ import pandas as pd
 import sqlalchemy as sql
 import zipfile
 
+from datetime import datetime
 from kaggle.api.kaggle_api_extended import KaggleApi
 
 
@@ -65,6 +66,7 @@ def process_existing_file(existing_file, engine, file_info):
     print(f"Importing {file_info['file_name']} from file system")
     try:
         with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
+            column_types = file_info['column_types']
             df = pd.read_csv(file)
             print(f"Clean the {file_info['file_name']} dataset...")
             tidy_df = clean_dataset(df, file_info)
@@ -81,11 +83,23 @@ def clean_dataset(df, file_info):
     :return: The cleaned dataframe containing only the wanted data.
     """
     important_cols = file_info['important_columns']
-    # Filter after year (specifically needed for london-crime dataset)
-    if 'year' in df:
+
+    # Check if the column 'year' or 'date' exists
+    # If yes, convert the column to datetime and filter out all data before 2013
+    if 'year' in df.columns:
         df = df[df['year'] > 2012]
-    df.replace('', np.nan)
+    if 'date' in df.columns:
+        df = df[pd.to_datetime(df['date'], format='%Y-%m-%d', errors='coerce').dt.year > 2012]
+
+    # Replace empty strings with NaN
+    df.replace('', np.nan, inplace=True)
+    df.replace('nan', np.nan, inplace=True)
+    df.replace('#', np.nan, inplace=True)
+
+    # Drop all rows with NaN values
     cleaned_df = df[important_cols].dropna()
+    cleaned_df = cleaned_df.astype(file_info['column_types'])
+
     return cleaned_df
 
 
@@ -102,6 +116,8 @@ def create_sqlite_table(df, table_name, engine):
 def main():
     kaggle_api = KaggleApi()
     kaggle_api.authenticate()
+
+    # Specify the data directory and the SQLite database engine.
     data_directory = '../data'
     engine = sql.create_engine('sqlite:///../data/data.sqlite')
 

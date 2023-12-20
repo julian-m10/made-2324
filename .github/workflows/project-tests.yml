@@ -1,0 +1,23 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - project/**
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  project-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        working-directory: ./project
+        run: ./tests/unit-tests.py
