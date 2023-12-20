@@ -5,8 +5,16 @@ import pandas as pd
 import sqlalchemy as sql
 import zipfile
 
-from datetime import datetime
-from kaggle.api.kaggle_api_extended import KaggleApi
+
+def connect_to_kaggle():
+    """
+    :return: Kaggle API object.
+    """
+    from kaggle.api.kaggle_api_extended import KaggleApi
+
+    kaggle_api = KaggleApi()
+    kaggle_api.authenticate()
+    return kaggle_api
 
 
 def check_file_exists(directory, file_substring):
@@ -66,7 +74,6 @@ def process_existing_file(existing_file, engine, file_info):
     print(f"Importing {file_info['file_name']} from file system")
     try:
         with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
-            column_types = file_info['column_types']
             df = pd.read_csv(file)
             print(f"Clean the {file_info['file_name']} dataset...")
             tidy_df = clean_dataset(df, file_info)
@@ -114,8 +121,7 @@ def create_sqlite_table(df, table_name, engine):
 
 
 def main():
-    kaggle_api = KaggleApi()
-    kaggle_api.authenticate()
+    kaggle_api = connect_to_kaggle()
 
     # Specify the data directory and the SQLite database engine.
     data_directory = '../data'

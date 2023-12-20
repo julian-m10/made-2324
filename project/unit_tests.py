@@ -1,14 +1,11 @@
 import pandas as pd
+import unittest
 
-from project.retrieve_data import clean_dataset
-from unittest import main, TestCase
-from unittest.mock import patch
+from retrieve_data import clean_dataset
 
 
-class TestDataTransformation(TestCase):
-
-    @patch('project.retrieve_data.download_files_from_kaggle')
-    def test_data_transformation(self, mock_read_data):
+class TestDataTransformation(unittest.TestCase):
+    def test_data_transformation(self):
         # Mock file info
         mock_file_info = {
             "important_columns": [
@@ -39,12 +36,6 @@ class TestDataTransformation(TestCase):
             'borough_flag': [1, 0, 1, 1, 0, 0, 1, 1]
         })
 
-        # Mock the return value of the function
-        mock_read_data.return_value = mock_data
-
-        # Call the transformation function
-        result = clean_dataset(mock_data, mock_file_info)
-
         # Define the expected output
         expected_result = pd.DataFrame({
             'area': ['barnet', 'bexley', 'bromley', 'croydon'],
@@ -56,11 +47,14 @@ class TestDataTransformation(TestCase):
             'number_of_jobs': [138000.0, 76000.0, 115000.0, 160000.0],
             'area_size': [2179.0, 8650.0, 8220.0, 1905.0],
             'no_of_houses': [112948.0, 95406.0, 77095.0, 80734.0]
-        })
+        }).reset_index(drop=True)
+
+        # Call the transformation function
+        result = clean_dataset(mock_data, mock_file_info).reset_index(drop=True)
 
         # Assert that the expected value is returned
-        pd.testing.assert_frame_equal(result.reset_index(drop=True), expected_result.reset_index(drop=True))
+        self.assertEqual(True, result.equals(expected_result))
 
 
 if __name__ == '__main__':
-    main()
+    unittest.main()

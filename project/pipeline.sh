@@ -1,17 +1,30 @@
 #!/bin/bash
 
-# Read package names from dependencies in packages.json file
-required_packages=$(jq -r '.dependencies | to_entries[] | "\(.key) \(.value)"' packages.json)
+# Check if 'packages.json' exists
+if [ ! -f "packages.json" ]; then
+    echo "Error: 'packages.json' file not found."
+    exit 1
+fi
 
-# Loop through each package and install the specified version, if not already installed
-while read -r package version; do
-    if ! python -c "import $package" &> /dev/null; then
-        echo "Installing $package@$version..."
-        pip install "$package==$version"
-    else
-        echo "$package@$version is already installed."
-    fi
-done <<< "$required_packages"
+# Read 'packages.json' and install required packages
+required_packages=$(python3 - << END
+import json
+
+with open('packages.json') as f:
+    data = json.load(f)
+    dependencies = data.get('dependencies', {})
+
+    packages = []
+    for package, version in dependencies.items():
+        packages.append(f"{package}=={version}")
+
+    print(" ".join(packages))
+END
+)
+
+# Install or upgrade required packages
+pip3 install --upgrade $required_packages
+
 
 # IMPORTANT:
 ## Because the data pipeline is going to connect to kaggle, it is necessary that a kaggle API token is available on the

@@ -1,23 +1,27 @@
-name: CI Pipeline
-
+name: Run Tests on Push
 on:
   push:
     branches:
       - main
-    paths:
-      - project/**
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  project-tests:
+  Tests:
     runs-on: ubuntu-latest
+    environment: Kaggle
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set execute permissions for tests.sh
+        run: |
+          cd project
+          chmod +x tests.sh
 
       - name: Run tests
-        working-directory: ./project
-        run: ./tests/unit-tests.py
+        env:
+          KAGGLE_USERNAME: ${{ secrets.USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KEY }}
+        run: |
+          cd project
+          bash ./tests.sh
