@@ -57,7 +57,7 @@ def process_non_existing_file(kaggle_api, engine, data_directory, file_info):
     )
     file_path = check_file_exists(data_directory, file_info['file_name']).pop()
     if zipfile.is_zipfile(file_path):
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+        with zipfile.ZipFile(file_path, "r") as zip_ref:
             zip_ref.extractall(data_directory + '/' + file_info['dataset_name'])
     existing_file = check_file_exists(data_directory, file_info['file_name'])
     process_existing_file(existing_file, engine, file_info)
@@ -74,11 +74,12 @@ def process_existing_file(existing_file, engine, file_info):
     print(f"Importing {file_info['file_name']} from file system")
     try:
         with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
-            df = pd.read_csv(file)
+            df = pd.read_csv(file, usecols=file_info['important_columns'], thousands=',')
+            df.rename(columns=file_info['new_column_names'], inplace=True)
             print(f"Clean the {file_info['file_name']} dataset...")
             tidy_df = clean_dataset(df, file_info)
             print(f"Creating table for {file_info['file_name']} in SQLite database...")
-            create_sqlite_table(tidy_df, file_info['file_name'].replace('.csv', ''), engine)
+            create_sqlite_table(tidy_df, file_info['table_name'], engine)
     except UnicodeDecodeError as e:
         print(f"Error reading file: {e}")
 
@@ -89,23 +90,29 @@ def clean_dataset(df, file_info):
     :param file_info: Information about the file which is to be processed. Retrievable from the csv_files_info.json.
     :return: The cleaned dataframe containing only the wanted data.
     """
-    important_cols = file_info['important_columns']
+    important_cols = file_info['new_column_names'].values()
 
     # Check if the column 'year' or 'date' exists
-    # If yes, convert the column to datetime and filter out all data before 2013
+    # If yes, convert the column to datetime and filter out all data before 2013 and past 2016
     if 'year' in df.columns:
-        df = df[df['year'] > 2012]
+        df = df[df['year'] > 2013]
     if 'date' in df.columns:
-        df = df[pd.to_datetime(df['date'], format='%Y-%m-%d', errors='coerce').dt.year > 2012]
+        df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+        df = df.loc[(df.date.dt.year > 2013) & (df.date.dt.year < 2017)]
+        df['date'] = df['date'].dt.strftime('%Y/%m/%d')
 
-    # Replace empty strings with NaN
-    df.replace('', np.nan, inplace=True)
-    df.replace('nan', np.nan, inplace=True)
-    df.replace('#', np.nan, inplace=True)
+    # Replace empty strings and wrong entries with NaN
+    df.replace('\\-|nan|\\#', np.nan, regex=True, inplace=True)
+    df.replace('.', np.nan, regex=False, inplace=True)
+    df.replace(',', '', inplace=True)
+    # Convert columns that contain pound signs to numeric values
+    columns_with_pound = [col for col in df.columns if any(isinstance(val, str) and '£' in val for val in df[col])]
+    df[columns_with_pound] = df[columns_with_pound].replace({'£': '', ',': ''}, regex=True)
+    df[columns_with_pound] = df[columns_with_pound].apply(pd.to_numeric, errors='coerce')
 
     # Drop all rows with NaN values
     cleaned_df = df[important_cols].dropna()
-    cleaned_df = cleaned_df.astype(file_info['column_types'])
+    cleaned_df = cleaned_df.astype(file_info['column_types'], errors='ignore')
 
     return cleaned_df
 

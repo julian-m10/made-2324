@@ -1,108 +1,125 @@
 [
     {
-        "file_name": "acorn_details.csv",
-        "author": "jeanmidev",
-        "dataset_name": "smart-meters-in-london",
-        "important_columns": [
-            "MAIN CATEGORIES", "CATEGORIES", "REFERENCE", "ACORN-A", "ACORN-B", "ACORN-C", "ACORN-D", "ACORN-E",
-            "ACORN-F", "ACORN-G", "ACORN-H", "ACORN-I", "ACORN-J", "ACORN-K", "ACORN-L", "ACORN-M", "ACORN-N",
-            "ACORN-O", "ACORN-P", "ACORN-Q"
-        ],
-        "column_types": {
-            "MAIN CATEGORIES": "object", "CATEGORIES": "object", "REFERENCE": "object", "ACORN-A": "float64",
-            "ACORN-B": "float64", "ACORN-C": "float64", "ACORN-D": "float64", "ACORN-E": "float64",
-            "ACORN-F": "float64", "ACORN-G": "float64", "ACORN-H": "float64", "ACORN-I": "float64",
-            "ACORN-J": "float64", "ACORN-K": "float64", "ACORN-L": "float64", "ACORN-M": "float64",
-            "ACORN-N": "float64", "ACORN-O": "float64", "ACORN-P": "float64", "ACORN-Q": "float64"
-        }
-    },
-    {
-        "file_name": "informations_households.csv",
-        "author": "jeanmidev",
-        "dataset_name": "smart-meters-in-london",
-        "important_columns": ["LCLid", "stdorToU", "Acorn", "Acorn_grouped", "file"],
-        "column_types": {
-            "LCLid": "object", "stdorToU": "object", "Acorn": "object", "Acorn_grouped": "object", "file": "object"
-        }
-    },
-    {
         "file_name": "london_crime_by_lsoa.csv",
+        "table_name": "london_crime_by_lsoa",
         "author": "jboysen",
         "dataset_name": "london-crime",
-        "important_columns": ["lsoa_code", "borough", "major_category", "value", "year"],
+        "important_columns": ["borough", "major_category", "year", "month", "value"],
+        "new_column_names": {
+            "borough": "borough", "major_category": "major_category", "year": "year", "month": "month", "value": "value"
+        },
         "column_types": {
-            "lsoa_code": "object", "borough": "object", "major_category": "object", "value": "float64",
-            "year": "float64"
+            "borough": "object", "major_category": "object", "year": "int64", "month": "int64", "value": "int64"
         }
     },
     {
         "file_name": "housing_in_london_yearly_variables.csv",
+        "table_name": "housing_in_london",
         "author": "justinas",
         "dataset_name": "housing-in-london",
         "important_columns": [
-            "code", "area", "date", "life_satisfaction", "mean_salary", "population_size", "number_of_jobs",
-            "area_size", "no_of_houses", "borough_flag"
+            "area", "date", "life_satisfaction", "mean_salary", "population_size", "number_of_jobs",
+            "area_size", "no_of_houses"
         ],
+        "new_column_names": {
+            "area": "area", "date": "date", "life_satisfaction": "life_satisfaction", "mean_salary": "mean_salary",
+            "population_size": "population_size", "number_of_jobs": "number_of_jobs", "area_size": "area_size",
+            "no_of_houses": "no_of_houses"
+        },
         "column_types": {
-            "code": "object", "area": "object", "date": "object", "life_satisfaction": "float64",
-            "mean_salary": "float64", "population_size": "float64", "number_of_jobs": "float64",
-            "area_size": "float64", "no_of_houses": "float64", "borough_flag": "float64"
+            "area": "object", "date": "object", "life_satisfaction": "float64", "mean_salary": "float64",
+            "population_size": "float64", "number_of_jobs": "float64", "area_size": "float64", "no_of_houses": "float64"
+        }
+    },
+    {
+        "file_name": "housing_in_london_monthly_variables.csv",
+        "table_name": "housing_in_london_monthly",
+        "author": "justinas",
+        "dataset_name": "housing-in-london",
+        "important_columns": [
+            "date", "area", "average_price"
+        ],
+        "new_column_names": {
+            "date": "date", "area": "area", "average_price": "mean_house_price"
+        },
+        "column_types": {
+            "date": "object", "area": "object", "mean_house_price": "int64"
         }
     },
     {
         "file_name": "london-borough-profiles-2016%20Data%20set.csv",
+        "table_name": "london_borough_profiles",
         "author": "marshald",
         "dataset_name": "london-boroughs",
         "important_columns": [
-            "Area name", "GLA Population Estimate 2016", "GLA Household Estimate 2016", "Inland Area (Hectares)",
-            "Population density (per hectare) 2016", "Average Age, 2016", "Proportion of population aged 0-15, 2016",
-            "Proportion of population of working-age, 2016", "Proportion of population aged 65 and over, 2016",
-            "Net internal migration (2014)", "Net international migration (2014)", "Net natural change (2014)",
-            "% of resident population born abroad (2014)", "Largest migrant population by country of birth (2011)",
-            "% of largest migrant population (2011)", "Second largest migrant population by country of birth (2011)",
-            "% of second largest migrant population (2011)",
-            "Third largest migrant population by country of birth (2011)",
-            "% of third largest migrant population (2011)", "% of population from BAME groups (2016)",
-            "% people aged 3+ whose main language is not English (2011 Census)",
-            "Overseas nationals entering the UK (NINo), (2014/15)", "New migrant (NINo) rates, (2014/15)",
-            "Largest migrant population arrived during 2014/15",
-            "Second largest migrant population arrived during 2014/15",
-            "Third largest migrant population arrived during 2014/15", "Employment rate (%) (2015)",
-            "Male employment rate (2015)", "Female employment rate (2015)", "Unemployment rate (2015)",
-            "Youth Unemployment (claimant) rate 18-24 (Dec-14)",
-            "Proportion of 16-18 year olds who are NEET (%) (2014)",
-            "Proportion of the working-age population who claim out-of-work benefits (%) (Aug-2015)",
-            "% working-age with a disability (2015)",
-            "Proportion of working age people with no qualifications (%) 2015",
-            "Proportion of working age with degree or equivalent and above (%) 2015", "Gross Annual Pay, (2015)",
-            "Gross Annual Pay - Male (2015)", "Gross Annual Pay - Female (2015)",
-            "Modelled Household median income estimates 2012/13",
-            "% adults that volunteered in past 12 months (2010/11 to 2012/13)", "Number of jobs by workplace (2014)",
-            "% of employment that is in public sector (2014)", "Jobs Density, 2014",
-            "Number of active businesses, 2014", "Two-year business survival rates (started in 2012)",
-            "Crime rates per thousand population 2014/15", "Fires per thousand population (2014)",
-            "Ambulance incidents per hundred population (2014)", "Median House Price, 2014",
-            "Average Band D Council Tax charge (£), 2015/16", "New Homes (net) 2014/15 (provisional)",
-            "Homes Owned outright, (2014) %", "Being bought with mortgage or loan, (2014) %",
-            "Rented from Local Authority or Housing Association, (2014) %", "Rented from Private landlord, (2014) %",
-            "% of area that is Greenspace, 2005", "Total carbon emissions (2013)",
-            "Household Waste Recycling Rate, 2014/15", "Number of cars, (2011 Census)",
-            "Number of cars per household, (2011 Census)", "% of adults who cycle at least once per month, 2013/14",
-            "Average Public Transport Accessibility score, 2014",
+            "Area name", "Average Age, 2016", "Life satisfaction score 2011-14 (out of 10)",
+            "% of population from BAME groups (2016)", "Employment rate (%) (2015)","Median House Price, 2014",
+            "Gross Annual Pay, (2015)",
             "Achievement of 5 or more A*- C grades at GCSE or equivalent including English and Maths, 2013/14",
-            "Rates of Children Looked After (2015)", "% of pupils whose first language is not English (2015)",
-            "% children living in out-of-work households (2014)", "Male life expectancy, (2012-14)",
-            "Female life expectancy, (2012-14)", "Teenage conception rate (2014)",
-            "Life satisfaction score 2011-14 (out of 10)", "Worthwhileness score 2011-14 (out of 10)",
-            "Happiness score 2011-14 (out of 10)", "Anxiety score 2011-14 (out of 10)",
-            "Childhood Obesity Prevalance (%) 2014/15", "People aged 17+ with diabetes (%)",
-            "Mortality rate from causes considered preventable 2012/14", "Political control in council",
+            "Male life expectancy, (2012-14)", "Female life expectancy, (2012-14)",
+            "Population density (per hectare) 2016", "Proportion of population aged 65 and over, 2016",
+            "Proportion of working age people with no qualifications (%) 2015",
+            "Proportion of working age with degree or equivalent and above (%) 2015", "Number of cars, (2011 Census)",
+            "Average Public Transport Accessibility score, 2014", "% of area that is Greenspace, 2005",
             "Proportion of seats won by Conservatives in 2014 election",
             "Proportion of seats won by Labour in 2014 election",
-            "Proportion of seats won by Lib Dems in 2014 election", "Turnout at 2014 local elections"
+            "Proportion of seats won by Lib Dems in 2014 election", "Turnout at 2014 local elections",
+            "Life satisfaction score 2011-14 (out of 10)", "Happiness score 2011-14 (out of 10)",
+            "Anxiety score 2011-14 (out of 10)", "Worthwhileness score 2011-14 (out of 10)"
         ],
+        "new_column_names": {
+            "Area name": "area_name",
+            "Average Age, 2016": "average_age",
+            "Life satisfaction score 2011-14 (out of 10)": "life_satisfaction_score",
+            "% of population from BAME groups (2016)": "pctg_population_bame",
+            "Employment rate (%) (2015)": "employment_rate",
+            "Median House Price, 2014": "median_house_price",
+            "Gross Annual Pay, (2015)": "gross_annual_pay",
+            "Achievement of 5 or more A*- C grades at GCSE or equivalent including English and Maths, 2013/14": "achvmt_5_or_more_gcse",
+            "Male life expectancy, (2012-14)": "male_life_expectancy",
+            "Female life expectancy, (2012-14)": "female_life_expectancy",
+            "Population density (per hectare) 2016": "population_density",
+            "Proportion of population aged 65 and over, 2016": "prop_population_over_65",
+            "Proportion of working age people with no qualifications (%) 2015": "prop_working_age_no_qualif",
+            "Proportion of working age with degree or equivalent and above (%) 2015": "prop_working_age_degree",
+            "Number of cars, (2011 Census)": "number_of_cars",
+            "Average Public Transport Accessibility score, 2014": "avg_public_transport_accessibility",
+            "% of area that is Greenspace, 2005": "pctg_area_greenspace",
+            "Proportion of seats won by Conservatives in 2014 election": "prop_seats_conservatives_2014_elect",
+            "Proportion of seats won by Labour in 2014 election": "prop_seats_labour_2014_elect",
+            "Proportion of seats won by Lib Dems in 2014 election": "prop_seats_lib_dems_2014_elect",
+            "Turnout at 2014 local elections": "turnout_2014_local_elect",
+            "Life satisfaction score 2011-14 (out of 10)": "life_satisfaction_score",
+            "Happiness score 2011-14 (out of 10)": "happiness_score",
+            "Anxiety score 2011-14 (out of 10)": "anxiety_score",
+            "Worthwhileness score 2011-14 (out of 10)": "worthwhileness_score"
+        },
         "column_types": {
-
+            "area_name": "object",
+            "average_age": "float64",
+            "life_satisfaction_score": "float64",
+            "pctg_population_bame": "float64",
+            "employment_rate": "float64",
+            "median_house_price": "int64",
+            "gross_annual_pay": "object",
+            "achvmt_5_or_more_gcse": "float64",
+            "male_life_expectancy": "float64",
+            "female_life_expectancy": "float64",
+            "population_density": "float64",
+            "prop_population_over_65": "float64",
+            "prop_working_age_no_qualif": "float64",
+            "prop_working_age_degree": "float64",
+            "number_of_cars": "int64",
+            "avg_public_transport_accessibility": "float64",
+            "pctg_area_greenspace": "float64",
+            "prop_seats_conservatives_2014_elect": "float64",
+            "prop_seats_labour_2014_elect": "float64",
+            "prop_seats_lib_dems_2014_elect": "float64",
+            "turnout_2014_local_elect": "float64",
+            "life_satisfaction_score": "float64",
+            "happiness_score": "float64",
+            "anxiety_score": "float64",
+            "worthwhileness_score": "float64"
         }
     }
 ]

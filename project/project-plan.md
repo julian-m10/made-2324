@@ -26,21 +26,14 @@ Health has always been a fairly extensive discussed topic and with thematically 
 
 The datasource profiles demographic data, such as labour market, economy and so on regarding the boroughs of London in the year of 2016.
 
-### Datasource2: Smart meters in London
-* Metadata URL: https://www.kaggle.com/datasets/jeanmidev/smart-meters-in-london/
-* Data URL: https://www.kaggle.com/datasets/jeanmidev/smart-meters-in-london
-* Data Type: CSV
-
-The datasource contains the energy consumption readings for a sample of about 5500 London households and information about the allocated acorn (a geodemographic segmentation of the UK's population) from between November 2011 and February 2014.
-
-### Datasource3: London Crime Data
+### Datasource2: London Crime Data
 * Metadata URL: https://www.kaggle.com/datasets/jboysen/london-crime
 * Data URL: https://www.kaggle.com/datasets/jboysen/london-crime?select=london_crime_by_lsoa.csv
 * Data Type: CSV
 
 Crime in major metropolitan areas, such as London, occurs in distinct patterns. This data covers the number of criminal reports by month, LSOA borough, and major/minor category from Jan 2008-Dec 2016.
 
-### Datasource4: Housing in London
+### Datasource3: Housing in London
 * Metadata URL: https://www.kaggle.com/datasets/justinas/housing-in-london
 * Data URL: https://www.kaggle.com/datasets/justinas/housing-in-london?select=housing_in_london_yearly_variables.csv
 * Data Type: CSV
@@ -61,10 +54,10 @@ This data contains information about the housing market of London from the years
 <!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
 
 1. Retrieve data sets and set up data pipeline including system tests [#6][i6] -- **Completed**
-2. Setup CI for project [#7][i7]
-3. Find suitable demographic classifiers [#1][i1]
-4. Define parameters to measure quality of life [#2][i2]
-5. Map demographic classifiers towards the quality of life parameters [#3][i3]
+2. Setup CI for project [#7][i7] -- **Completed**
+3. Find suitable demographic classifiers [#1][i1] -- **Completed**
+4. Define parameters to measure quality of life [#2][i2] -- **Completed**
+5. Map demographic classifiers towards the quality of life parameters [#3][i3] -- **Completed**
 6. Analyze the mappings [#4][i4]
  
 
