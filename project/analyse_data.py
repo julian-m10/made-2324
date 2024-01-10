@@ -53,26 +53,31 @@ def main():
     # Fetching data for each analysis from the respective tables
     query_dict = {
         'life_satisfaction_query': "SELECT area_name, average_age, life_satisfaction_score "
-                                   "FROM london_borough_profiles",
+                                   "FROM london_borough_profiles ORDER BY average_age, life_satisfaction_score",
         'bame_population_query': "SELECT area_name, pctg_population_bame "
-                                 "FROM london_borough_profiles ORDER BY area_name",
-        'crime_query': "SELECT A.borough, A.major_category, A.month, A.year, SUM(A.value) AS total_count "
+                                 "FROM london_borough_profiles ORDER BY pctg_population_bame",
+        'crime_query': "SELECT A.borough, A.major_category, SUM(A.value) AS total_count "
                        "FROM london_crime_by_lsoa as A "
                        "INNER JOIN london_borough_profiles as B ON A.borough = B.area_name "
-                       "GROUP BY borough, major_category, year, month",
+                       "GROUP BY borough, major_category",
+        'crime_amount_query': "SELECT A.borough, SUM(A.value) AS total_count FROM london_crime_by_lsoa as A "
+                              "INNER JOIN london_borough_profiles as B ON A.borough = B.area_name "
+                              "GROUP BY A.borough ORDER BY total_count",
         'house_price_query': "SELECT A.area, A.date, A.mean_house_price FROM housing_in_london_monthly as A "
                              "INNER JOIN london_borough_profiles as B ON A.area = LOWER(B.area_name)",
-        'gross_annual_pay_query': "SELECT area_name, gross_annual_pay FROM london_borough_profiles ORDER BY area_name",
+        'gross_annual_pay_query': "SELECT area_name, gross_annual_pay FROM london_borough_profiles "
+                                  "ORDER BY gross_annual_pay",
         'health_query': "SELECT area_name, male_life_expectancy, female_life_expectancy, population_density, "
                         "prop_population_over_65 FROM london_borough_profiles",
         'education_query': "SELECT area_name, prop_working_age_no_qualif, prop_working_age_degree, "
                            "achvmt_5_or_more_gcse, gross_annual_pay, employment_rate "
-                           "FROM london_borough_profiles",
+                           "FROM london_borough_profiles ORDER BY prop_working_age_no_qualif",
         'transport_env_query': "SELECT area_name, number_of_cars, avg_public_transport_accessibility, "
-                               "pctg_area_greenspace FROM london_borough_profiles ORDER BY area_name",
+                               "pctg_area_greenspace FROM london_borough_profiles ORDER BY number_of_cars",
         'political_analysis_query': "SELECT area_name, prop_seats_conservatives_2014_elect, "
                                     "prop_seats_labour_2014_elect, prop_seats_lib_dems_2014_elect "
-                                    "FROM london_borough_profiles",
+                                    "FROM london_borough_profiles ORDER BY prop_seats_conservatives_2014_elect, "
+                                    "prop_seats_labour_2014_elect, prop_seats_lib_dems_2014_elect",
         'political_turnout_query': "SELECT area_name, turnout_2014_local_elect FROM london_borough_profiles "
                                    "ORDER BY turnout_2014_local_elect DESC",
         'wellbeing_scores_query': "SELECT area_name, life_satisfaction_score, happiness_score, anxiety_score, "
@@ -142,7 +147,10 @@ def main():
     sns.set_style('whitegrid')
     data_frames['crime']['borough'] = [area[:12] + '..' if len(area) > 12 else area for area in
                                        data_frames['crime']['borough']]
+    data_frames['crime_amount']['borough'] = [area[:12] + '..' if len(area) > 12 else area for area in
+                                              data_frames['crime_amount']['borough']]
     sub_frame = data_frames['crime'].groupby(['borough', 'major_category'])['total_count'].sum().unstack()
+    sub_frame = sub_frame.reindex(data_frames['crime_amount']['borough'].tolist())
     sub_frame.plot(kind='bar', stacked=True, figsize=(13, 13))
     plt.xticks(rotation=45)
     plt.legend(title='Major Crime Category', loc='upper left')

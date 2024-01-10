@@ -58,7 +58,7 @@ This data contains information about the housing market of London from the years
 3. Find suitable demographic classifiers [#1][i1] -- **Completed**
 4. Define parameters to measure quality of life [#2][i2] -- **Completed**
 5. Map demographic classifiers towards the quality of life parameters [#3][i3] -- **Completed**
-6. Analyze the mappings [#4][i4]
+6. Analyze the mappings [#4][i4] -- **Completed**
  
 
 [i1]: https://github.com/julian-m10/made-2324/issues/1

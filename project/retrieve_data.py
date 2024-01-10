@@ -96,6 +96,7 @@ def clean_dataset(df, file_info):
     # If yes, convert the column to datetime and filter out all data before 2013 and past 2016
     if 'year' in df.columns:
         df = df[df['year'] > 2013]
+        df = df[df['year'] < 2017]
     if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
         df = df.loc[(df.date.dt.year > 2013) & (df.date.dt.year < 2017)]
