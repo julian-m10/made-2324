@@ -9,10 +9,10 @@
 </div>
 
 ## Overview
-This project aims to analyze the demographic subdivisions of the city of London and explore their correlation with the 
-general quality of life. By investigating various demographic factors such as age, income, housing, health indicators, 
-education, transportation, and political aspects, deriving insights into how these factors contribute to the 
-overall well-being of different urban areas is the main goal of this project.
+This project delves into the demographic subdivisions of the City of London, aiming to uncover their connection with the 
+overall quality of life. Through the exploration of factors like age, income, housing, health indicators, education, 
+transportation, and political aspects, the primary objective is to understand how these elements influence the 
+well-being of diverse urban areas.
 
 ## Motivation
 The motivation behind this project lies in the increasing awareness of the impact of demographic factors on individuals' 
