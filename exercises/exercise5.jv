@@ -1,0 +1,73 @@
+pipeline GTFSPipeline {
+
+    // Connecting all blocks into a data pipeline
+    GTFSExtractor
+        ->GTFSArchiveInterpreter
+        ->GTFSFilePicker
+        ->GTFSTextInterpreter
+        ->GTFSCSVInterpreter
+        ->GTFSTableInterpreter
+        ->GTFSLoader;
+    
+    // Fetching the data as a zip file from the given URL
+    block GTFSExtractor oftype HttpExtractor {
+        url: 'https://gtfs.rhoenenergie-bus.de/GTFS.zip';
+    }
+
+    // Interprete the downloaded file as zip archive
+    block GTFSArchiveInterpreter oftype ArchiveInterpreter {
+        archiveType: 'zip';
+    }
+
+    // Read a specific file from the archive
+    block GTFSFilePicker oftype FilePicker { 
+        path: '/stops.txt';
+    }
+
+    // Interpret the file as a text file
+    block GTFSTextInterpreter oftype TextFileInterpreter {
+        encoding: 'utf8';
+    }
+    
+    // Interpret the text file as a csv file
+    block GTFSCSVInterpreter oftype CSVInterpreter {
+        enclosing: '"';
+    }    
+
+    // Set a constraint and a value type to validate the ZoneID
+    constraint ZoneIDConstraint on integer:
+        value == 2001;
+
+    valuetype ValidZoneID oftype integer {
+        constraints: [ZoneIDConstraint];
+    }
+
+    // Set a constraint and a value type to validate the coordinates
+    constraint CoordinatesRangeConstraint oftype RangeConstraint {
+        lowerBound: -90;
+        upperBound: 90;
+    }
+
+    valuetype ValidCoordinate oftype decimal {
+        constraints: [CoordinatesRangeConstraint];
+    }
+
+    // Interprete the csv file as a table and specify the data types
+    block GTFSTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            'stop_id' oftype integer,
+            'stop_name' oftype text,
+            'stop_lat' oftype ValidCoordinate,
+            'stop_lon' oftype ValidCoordinate,
+            'zone_id' oftype ValidZoneID,
+        ];
+    }
+
+    // Export the table into a sqlite database
+    block GTFSLoader oftype SQLiteLoader {
+        table: 'stops';
+        file: './gtfs.sqlite';
+    }
+
+}
